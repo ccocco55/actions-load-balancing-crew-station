@@ -7,7 +7,7 @@
 
 ---
 
-## ☁️ 전체 아키텍처 구성도
+## ☁️ 인프라 구성도
 
 ![슬라이드3](https://github.com/user-attachments/assets/21b71112-ea81-4039-90f5-0a85f7ff6d22)
 
@@ -28,31 +28,48 @@
 
 ---
 
-## ⚖️ 로드밸런싱 방식
+## ⚖️ 로드밸런싱
 
-- **알고리즘**: `least_conn`  
-  → 현재 연결 수가 가장 적은 서버로 요청을 전달하여 부하를 균등하게 분산합니다.
+###  🔽 Nginx 설치 
+```
+# 설치
+sudo apt install nginx
 
-### 🔧 Nginx 설정 예시
-``` nginx
-upstream simple_crew-station {
-        least_conn;
-        server ipaddress1:80;  # 첫 번째 EC2
-        server ipaddress2:80;  # 두 번째 EC2
-}
-
-server {
-        listen 80;
-
-        location / {
-                proxy_pass http://simple_app;
-                proxy_set_header Host $host;
-                proxy_set_header X-Real-IP $remote_addr;
-    }
-}
+# 파일 만들기
+sudo vim /etc/nginx/sites-available/[앱 이름]
 ```
 
----
+### 🔧 Nginx 설정
+```
+/etc/nginx/sites-available/simple-loadbalancer
+```
+
+``` nginx
+upstream simple_[앱 이름] {
+        least_conn;
+        server ipaddress1:함   
+  → 요청을 서버 순서대로 균등하게 분배하는 방식
+  
+- **IP Hash**: `ip_hash`   
+  → 클라이언트 IP를 해싱하여 항상 같은 서버로 요청 전달
+
+### 
+
+--- ✔️ 적용/상태 확인
+
+```
+# 기존 링크 삭제
+sudo rm /etc/nginx/sites-enabled/default
+
+# 만든 파일 링크 걸어주기
+sudo ln -s /etc/nginx/sites-available/[이름] /etc/nginx/sites-enabled/
+
+# 확인
+ls -l /etc/nginx/sites-enabled/
+
+# 설정한 파일에 문제 체크
+sudo nginx -t
+```
 
 ## 🔄 트래픽 흐름
 
