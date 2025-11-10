@@ -41,21 +41,39 @@ sudo vim /etc/nginx/sites-available/[앱 이름]
 
 ### 🔧 Nginx 설정
 ```
-/etc/nginx/sites-available/simple-loadbalancer
+/etc/nginx/sites-available/[앱 이름]-loadbalancer
 ```
 
 ``` nginx
-upstream simple_[앱 이름] {
+/etc/nginx/sites-available/[앱 이름]-loadbalancer
+```
+
+``` nginx
+upstream [앱 이름] {
+	# 요청을 서버 순서대로 균등하게 분배하는 방식
         least_conn;
-        server ipaddress1:함   
-  → 요청을 서버 순서대로 균등하게 분배하는 방식
-  
-- **IP Hash**: `ip_hash`   
-  → 클라이언트 IP를 해싱하여 항상 같은 서버로 요청 전달
+	# 차례대로 할꺼면 아무것도 안쓰기
 
-### 
+	# 클라이언트 IP를 해싱하여 항상 같은 서버로 요청 전달
+	      # ip_hash;
 
---- ✔️ 적용/상태 확인
+        server ipaddress1:80;  # 첫 번째 EC2
+        server ipaddress2:80;  # 두 번째 EC2
+}
+
+server {
+        listen 80;
+
+        location / {
+                proxy_pass http://[앱 이름];
+                proxy_set_header Host $host;
+                proxy_set_header X-Real-IP $remote_addr;
+    }
+}
+```
+
+--- 
+✔️ 적용/상태 확인
 
 ```
 # 기존 링크 삭제
