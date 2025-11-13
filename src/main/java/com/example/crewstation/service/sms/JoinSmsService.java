@@ -53,7 +53,6 @@ public class JoinSmsService {
         try {
             SingleMessageSentResponse response = this.messageService.sendOne(new SingleMessageSendingRequest(message));
             log.info("Sending sms message to phone number " + response);
-            log.info("code {}:::::::::", code);
         } catch (Exception e) {
             log.info("apikey {}", apiKey);
             log.info("apikey 길이 {}", apiKey.length());
